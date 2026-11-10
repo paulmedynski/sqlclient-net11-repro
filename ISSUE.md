@@ -1,5 +1,3 @@
-**Title:** Microsoft.Data.SqlClient queries use 20–35% more CPU on .NET 11 than on .NET 10 (Windows, same SqlClient binary)
-
 ### Description
 
 After moving an ASP.NET Core service from .NET 10 to .NET 11, each API request costs 4–24% more process CPU at the same
@@ -12,7 +10,7 @@ the runtime. Queries per second and bytes allocated per query are the same on bo
 
 ### Reproduction Steps
 
-Full project (csproj, Program.cs, run.ps1, README): **[https://github.com/rushfrisby/sqlclient-net11-repro]**
+Full project (csproj, Program.cs, run.ps1, README): https://github.com/rushfrisby/sqlclient-net11-repro
 
 Each of N workers runs this in a closed loop:
 
@@ -91,8 +89,8 @@ I haven't checked Linux.
 - **Broader than native SNI:** native SNI completes I/O through the thread pool's I/O completion port, while managed SNI
   uses `Socket` async I/O. Both regress at 16 workers, so the cost may be in async I/O completion or continuation
   dispatch generally, rather than in one of the two.
-- **Possibly related:** the .NET 11 performance post describes a change to how overlapped I/O completions are signaled
-  on Windows. I haven't been able to connect it to this.
+- **Possibly related:** [Performance Improvements in .NET 11](https://devblogs.microsoft.com/dotnet/performance-improvements-in-net-11/)
+  describes a change to how overlapped I/O completions are signaled on Windows. I haven't been able to connect it to this.
 - **Not profiled at the OS level:** I couldn't take an ETW CPU profile (that needs an elevated session). The EventPipe
   sample profiler attributes busy samples differently on the two runtimes (.NET 10 reports `PollGC` and safepoint frames,
   .NET 11 the actual leaf frames), so those profiles don't compare. I'm happy to collect a trace if you tell me what
